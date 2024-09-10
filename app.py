@@ -9,6 +9,10 @@ import os
 
 app = Flask(__name__)
 
+# Download necessary NLTK resources
+nltk.download('stopwords')
+nltk.download('punkt_tab')  # Tambahkan pengunduhan ini di sini
+
 # Preprocess function
 def preprocess_text(text):
     tokens = word_tokenize(text)
@@ -19,7 +23,7 @@ def preprocess_text(text):
 
 # Load data and preprocess
 file_path = 'yogyakarta_budaya.csv'
-if os.path.exists(file_path):
+if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
     df = pd.read_csv(file_path)
     df['processed_description'] = df['Description'].apply(preprocess_text)
     vectorizer = TfidfVectorizer()
@@ -27,10 +31,14 @@ if os.path.exists(file_path):
 else:
     df = pd.DataFrame()
     vectorizer = None
+    tfidf_matrix = None
 
 # Define the route for recommending museums
 @app.route('/recommend', methods=['POST'])
 def recommend_museum():
+    if vectorizer is None or tfidf_matrix is None:
+        return jsonify({"error": "Data not available"}), 400
+    
     input_desc = request.json['description']
     input_desc_processed = preprocess_text(input_desc)
     input_vector = vectorizer.transform([input_desc_processed])

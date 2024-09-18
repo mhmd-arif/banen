@@ -49,6 +49,7 @@ def recommend_museum():
     results = []
     for i in top_indices:
         results.append({
+            'Place_ID': df.iloc[i]['Place_ID'],  # Tambahkan ID tempat
             'Place_Name': df.iloc[i]['Place_Name'],
             'Description': df.iloc[i]['Description'],
             'Similarity_Score': similarities[i]

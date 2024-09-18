@@ -50,6 +50,7 @@ def recommend_museum():
     for i in top_indices:
         results.append({
             'Place_Name': df.iloc[i]['Place_Name'],
+            'Description': df.iloc[i]['Description'],
             'Similarity_Score': similarities[i]
         })
     return jsonify(results)

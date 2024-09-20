@@ -55,5 +55,22 @@ def recommend_museum():
         })
     return jsonify(results)
 
+
+# Route untuk mengambil semua tempat wisata
+@app.route('/places', methods=['GET'])
+def get_all_places():
+    if df.empty:
+        return jsonify({'error': 'Data not found'}), 500
+
+    places = []
+    for _, row in df.iterrows():
+        places.append({
+            'Place_Name': row['Place_Name'],
+            'Description': row['Description'],
+            'Similarity_Score': 1.0  # Atau gunakan nilai default jika similarity score tidak relevan
+        })
+    return jsonify(places)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

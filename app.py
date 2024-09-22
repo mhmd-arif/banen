@@ -44,16 +44,20 @@ def recommend_museum():
     input_desc_processed = preprocess_text(input_desc)
     input_vector = vectorizer.transform([input_desc_processed])
     similarities = cosine_similarity(input_vector, tfidf_matrix).flatten()
-    top_indices = similarities.argsort()[-3:][::-1]
+
+    # Urutkan indeks berdasarkan similarity score dari yang terbesar ke terkecil
+    sorted_indices = similarities.argsort()[::-1]
     
     results = []
-    for i in top_indices:
+    for i in sorted_indices:
         results.append({
             'Place_Name': df.iloc[i]['Place_Name'],
             'Description': df.iloc[i]['Description'],
             'Similarity_Score': similarities[i]
         })
+    
     return jsonify(results)
+
 
 
 # Route untuk mengambil semua tempat wisata
@@ -67,7 +71,6 @@ def get_all_places():
         places.append({
             'Place_Name': row['Place_Name'],
             'Description': row['Description'],
-            'Similarity_Score': 1.0  # Atau gunakan nilai default jika similarity score tidak relevan
         })
     return jsonify(places)
 

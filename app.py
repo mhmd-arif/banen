@@ -77,6 +77,8 @@ def get_all_places():
         places.append({
             'Place_Name': row['Place_Name'],
             'Description': row['Description'],
+            'Lat': row['Lat'],     # Tambahkan koordinat Lat
+            'Long': row['Long']    # Tambahkan koordinat Long
         })
     return jsonify(places)
 

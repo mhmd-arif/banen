@@ -88,8 +88,8 @@ def calculate_distance():
 
     # Ambil titik awal dari request
     start_point = request.json
-    lat1 = start_point['Lat']
-    lon1 = start_point['Long']
+    lat1 = start_point['lat']
+    lon1 = start_point['lon']
 
     # Hitung jarak ke semua tempat di dataset
     df['Distance'] = df.apply(lambda row: haversine(lat1, lon1, row['Lat'], row['Long']), axis=1)

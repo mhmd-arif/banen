@@ -33,9 +33,9 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 # Load dataset dan preprocess
-file_path = 'yogyakarta_budaya.csv'
+file_path = 'datafix2.csv'
 if os.path.exists(file_path):
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, encoding='ISO-8859-1')
     df['processed_description'] = df['Description'].apply(preprocess_text)
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(df['processed_description'])
@@ -78,7 +78,8 @@ def get_all_places():
             'Place_Name': row['Place_Name'],
             'Description': row['Description'],
             'Lat': row['Lat'],     # Tambahkan koordinat Lat
-            'Long': row['Long']    # Tambahkan koordinat Long
+            'Long': row['Long'],    # Tambahkan koordinat Long
+            'Image': row['Image']  # Tambahkan ImageURL
         })
     return jsonify(places)
 

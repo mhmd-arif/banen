@@ -10,8 +10,8 @@ COPY . /app
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download necessary NLTK data
-RUN python -m nltk.downloader -d /usr/local/nltk_data punkt stopwords
+# Download the necessary NLTK data
+RUN python -m nltk.downloader -d /usr/local/nltk_data punkt stopwords punkt_tab
 
 # Set environment variable for NLTK data path
 ENV NLTK_DATA=/usr/local/nltk_data

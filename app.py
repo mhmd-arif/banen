@@ -9,13 +9,18 @@ from nltk.tokenize import word_tokenize
 import os
 from math import radians, sin, cos, sqrt, atan2
 
+# Ensure NLTK knows where to download data
+nltk.data.path.append("/usr/local/nltk_data")
+
+# Download necessary NLTK resources
+nltk.download('punkt', download_dir='/usr/local/nltk_data')
+nltk.download('stopwords', download_dir='/usr/local/nltk_data')
+nltk.download('punkt_tab')  # Explicit download
+
 app = Flask(__name__)
 CORS(app)
 
-nltk.download('stopwords')
-nltk.download('punkt')
-
-# Fungsi preprocessing text
+# Preprocessing text function
 def preprocess_text(text):
     tokens = word_tokenize(text)
     tokens = [word.lower() for word in tokens]
@@ -23,16 +28,16 @@ def preprocess_text(text):
     tokens = [word for word in tokens if word not in stopwords.words('indonesian')]
     return ' '.join(tokens)
 
-# Fungsi Haversine untuk menghitung jarak antara dua koordinat
+# Haversine function to calculate distances between coordinates
 def haversine(lat1, lon1, lat2, lon2):
-    R = 6371  # Radius of the earth in km
+    R = 6371  # Radius of Earth in km
     dlat = radians(lat2 - lat1)
-    dlon = radians(lon1 - lon2)
+    dlon = radians(lon2 - lon1)
     a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
-# Load dataset dan preprocess
+# Load dataset and preprocess it
 file_path = 'datafix2.csv'
 if os.path.exists(file_path):
     df = pd.read_csv(file_path, encoding='ISO-8859-1')
@@ -43,7 +48,7 @@ else:
     df = pd.DataFrame()
     vectorizer = None
 
-# Route untuk rekomendasi museum
+# Route to recommend places based on description
 @app.route('/recommend', methods=['POST'])
 def recommend_museum():
     if not vectorizer or df.empty:
@@ -53,9 +58,8 @@ def recommend_museum():
     input_desc_processed = preprocess_text(input_desc)
     input_vector = vectorizer.transform([input_desc_processed])
     similarities = cosine_similarity(input_vector, tfidf_matrix).flatten()
-
     sorted_indices = similarities.argsort()[::-1]
-    
+
     results = []
     for i in sorted_indices:
         results.append({
@@ -63,10 +67,10 @@ def recommend_museum():
             'Description': df.iloc[i]['Description'],
             'Similarity_Score': similarities[i]
         })
-    
+
     return jsonify(results)
 
-# Route untuk mengambil semua tempat wisata
+# Route to fetch all places in the dataset
 @app.route('/places', methods=['GET'])
 def get_all_places():
     if df.empty:
@@ -77,30 +81,25 @@ def get_all_places():
         places.append({
             'Place_Name': row['Place_Name'],
             'Description': row['Description'],
-            'Lat': row['Lat'],     # Tambahkan koordinat Lat
-            'Long': row['Long'],    # Tambahkan koordinat Long
-            'Image': row['Image']  # Tambahkan ImageURL
+            'Lat': row['Lat'],
+            'Long': row['Long'],
+            'Image': row['Image']
         })
     return jsonify(places)
 
-# Endpoint baru untuk menghitung jarak menggunakan Haversine
+# Route to calculate distances using Haversine formula
 @app.route('/distance', methods=['POST'])
 def calculate_distance():
     if df.empty:
         return jsonify({'error': 'Data not found'}), 500
 
-    # Ambil titik awal dari request
     start_point = request.json
     lat1 = start_point['lat']
     lon1 = start_point['lon']
 
-    # Hitung jarak ke semua tempat di dataset
     df['Distance'] = df.apply(lambda row: haversine(lat1, lon1, row['Lat'], row['Long']), axis=1)
-
-    # Sortir berdasarkan jarak terdekat
     sorted_places = df.sort_values('Distance')
 
-    # Buat list hasil dengan jarak
     results = []
     for _, row in sorted_places.iterrows():
         results.append({
@@ -112,6 +111,7 @@ def calculate_distance():
 
     return jsonify(results)
 
+# Run the app with Gunicorn or locally for testing
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 

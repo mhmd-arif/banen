@@ -11,9 +11,8 @@ from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
 CORS(app)
-
 nltk.download('stopwords')
-nltk.download('punkt')
+nltk.download('punkt')  # Add this line
 
 # Fungsi preprocessing text
 def preprocess_text(text):
@@ -48,14 +47,12 @@ else:
 def recommend_museum():
     if not vectorizer or df.empty:
         return jsonify({'error': 'Data not found or model not loaded'}), 500
-
     input_desc = request.json['description']
     input_desc_processed = preprocess_text(input_desc)
     input_vector = vectorizer.transform([input_desc_processed])
     similarities = cosine_similarity(input_vector, tfidf_matrix).flatten()
-
     sorted_indices = similarities.argsort()[::-1]
-    
+
     results = []
     for i in sorted_indices:
         results.append({
@@ -63,7 +60,6 @@ def recommend_museum():
             'Description': df.iloc[i]['Description'],
             'Similarity_Score': similarities[i]
         })
-    
     return jsonify(results)
 
 # Route untuk mengambil semua tempat wisata
@@ -71,14 +67,13 @@ def recommend_museum():
 def get_all_places():
     if df.empty:
         return jsonify({'error': 'Data not found'}), 500
-
     places = []
     for _, row in df.iterrows():
         places.append({
             'Place_Name': row['Place_Name'],
             'Description': row['Description'],
-            'Lat': row['Lat'],     # Tambahkan koordinat Lat
-            'Long': row['Long'],    # Tambahkan koordinat Long
+            'Lat': row['Lat'],  # Tambahkan koordinat Lat
+            'Long': row['Long'],  # Tambahkan koordinat Long
             'Image': row['Image']  # Tambahkan ImageURL
         })
     return jsonify(places)
@@ -88,18 +83,14 @@ def get_all_places():
 def calculate_distance():
     if df.empty:
         return jsonify({'error': 'Data not found'}), 500
-
     # Ambil titik awal dari request
     start_point = request.json
     lat1 = start_point['lat']
     lon1 = start_point['lon']
-
     # Hitung jarak ke semua tempat di dataset
     df['Distance'] = df.apply(lambda row: haversine(lat1, lon1, row['Lat'], row['Long']), axis=1)
-
     # Sortir berdasarkan jarak terdekat
     sorted_places = df.sort_values('Distance')
-
     # Buat list hasil dengan jarak
     results = []
     for _, row in sorted_places.iterrows():
@@ -109,7 +100,6 @@ def calculate_distance():
             'Lat': row['Lat'],
             'Long': row['Long']
         })
-
     return jsonify(results)
 
 if __name__ == '__main__':

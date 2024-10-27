@@ -1,20 +1,20 @@
-# Use Python slim image to reduce size
+# Use Python slim image to keep it lightweight
 FROM python:3.9-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the project files to the container
+# Copy all files from your project into the container
 COPY . /app
 
-# Install dependencies from requirements.txt
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download NLTK data into /tmp/nltk_data
-RUN python download_nltk_data.py
+# Download NLTK data
+RUN python -m nltk.downloader punkt stopwords
 
-# Expose port 5000 to the host machine
+# Expose port 5000 to the host
 EXPOSE 5000
 
-# Run the Flask app using Gunicorn
+# Command to run the Flask app using Gunicorn
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]

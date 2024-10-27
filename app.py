@@ -110,7 +110,11 @@ def calculate_distance():
     return jsonify(results)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        app.run(debug=True)
+    except Exception as e:
+        print(f"Error: {e}")
+
 
 def handler(event, context):
     return app(event, context)

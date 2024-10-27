@@ -13,13 +13,12 @@ app = Flask(__name__)
 CORS(app)
 nltk.download('stopwords')
 nltk.download('punkt')
-nltk.download('punkt_tab')  # Add this line
 
 # Fungsi preprocessing text
 def preprocess_text(text):
     tokens = word_tokenize(text)
     tokens = [word.lower() for word in tokens]
-    tokens = [word for word in tokens if word is alphanumeric()]
+    tokens = [word for word in tokens if word.isalnum()]
     tokens = [word for word in tokens if word not in stopwords.words('indonesian')]
     return ' '.join(tokens)
 

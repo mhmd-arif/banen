@@ -14,8 +14,11 @@ app = Flask(__name__)
 CORS(app)
 
 # Set NLTK data path to a writable directory
-temp_dir = tempfile.gettempdir()
+temp_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
+if not os.path.exists(temp_dir):
+    os.makedirs(temp_dir)
 nltk.data.path.append(temp_dir)
+
 nltk.download('stopwords', download_dir=temp_dir)
 nltk.download('punkt', download_dir=temp_dir)
 

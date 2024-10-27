@@ -11,8 +11,15 @@ from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
 CORS(app)
-nltk.download('stopwords')
-nltk.download('punkt')
+
+# Ensure NLTK data is downloaded
+nltk_data_path = '/usr/share/nltk_data'
+if not os.path.exists(nltk_data_path):
+    nltk.download('stopwords', download_dir=nltk_data_path)
+    nltk.download('punkt', download_dir=nltk_data_path)
+    nltk.download('punkt_tab', download_dir=nltk_data_path)
+else:
+    nltk.data.path.append(nltk_data_path)
 
 # Fungsi preprocessing text
 def preprocess_text(text):

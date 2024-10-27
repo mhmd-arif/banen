@@ -4,14 +4,17 @@ FROM python:3.9-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy all files from your project into the container
+# Copy all project files into the container
 COPY . /app
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download NLTK data
-RUN python -m nltk.downloader punkt stopwords
+# Download necessary NLTK data
+RUN python -m nltk.downloader -d /usr/local/nltk_data punkt stopwords
+
+# Set environment variable for NLTK data path
+ENV NLTK_DATA=/usr/local/nltk_data
 
 # Expose port 5000 to the host
 EXPOSE 5000

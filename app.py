@@ -8,19 +8,12 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import os
 from math import radians, sin, cos, sqrt, atan2
-import tempfile
 
 app = Flask(__name__)
 CORS(app)
 
-# Set NLTK data path to a writable directory
-temp_dir = os.path.join(tempfile.gettempdir(), 'nltk_data')
-if not os.path.exists(temp_dir):
-    os.makedirs(temp_dir)
-nltk.data.path.append(temp_dir)
-
-nltk.download('stopwords', download_dir=temp_dir)
-nltk.download('punkt', download_dir=temp_dir)
+nltk_data_path = '/tmp/nltk_data'
+nltk.data.path.append(nltk_data_path)
 
 # Fungsi preprocessing text
 def preprocess_text(text):
